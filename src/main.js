@@ -4,6 +4,7 @@ import 'babel-polyfill'
 import Vue from 'vue'
 import App from './App.vue'
 import vuetify from './plugins/vuetify';
+import axios from 'axios';
 import * as VueGoogleMaps from 'vue2-google-maps'
 import { Vue2Dragula } from 'vue2-dragula'
 import VueQuillEditor from 'vue-quill-editor'
@@ -44,7 +45,7 @@ router.beforeEach((to, from, next) => {
 	if (to.matched.some(record => record.meta.requiresAuth)) {
 		// this route requires auth, check if logged in
 		// if not, redirect to login page.
-		if (localStorage.getItem('user') === null) {
+		if (localStorage.getItem('user') === null || localStorage.getItem('jwt') === null) {
 			next({
 				path: '/session/login',
 				query: { redirect: to.fullPath }
@@ -74,6 +75,15 @@ router.afterEach(() => {
 			miniLayout.scrollTop = 0;
 		}
 	}, 200);
+})
+
+
+Vue.use({
+    install (Vue) {
+    Vue.prototype.$axios = axios.create({
+      baseURL: 'http://localhost:5566'
+    })
+  }
 })
 
 Vue.use(InstantSearch);

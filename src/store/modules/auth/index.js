@@ -2,7 +2,6 @@
  * Auth Module
  */
 import Vue from 'vue'
-import axios from 'axios'
 import firebase from 'firebase/app';
 import Nprogress from 'nprogress';
 import router from '../../../router';
@@ -30,10 +29,11 @@ const getters = {
 
 // actions
 const actions = {
-    async login() {
-        const loginResult = await axios.post('http://localhost:5566/login', {
-            "username": "admin",
-            "password": "admin"
+    async login(context, user) {
+        const { username, password } = user
+        const loginResult = await this.$axios.post('/login', {
+            username,
+            password
         })
         console.log(38, loginResult);
     },

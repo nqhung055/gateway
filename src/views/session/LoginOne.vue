@@ -12,20 +12,18 @@
 						width="78" 
 						height="78" 
 					/>
-					<h2 class="mb-4">{{$t('message.loginToAdmin')}}</h2>
-					<p class="fs-14">{{$t('message.enterUsernameAndPasswordToAccessControlPanelOf')}} {{brand}}.</p>
+					<h2 class="mb-4">{{$t('message.gateway')}}</h2>
+					<p class="fs-14">{{$t('message.gatewayLoginNotice')}}</p>
 					<v-form v-model="valid" class="mb-5">
 						<v-text-field 
 							label="E-mail ID" 
-							v-model="email" 
-							:rules="emailRules" 
+							v-model="username"
 							required
 						></v-text-field>
 						<v-text-field 
 							label="Password" 
 							v-model="password" 
-							type="password" 
-							:rules="passwordRules" 
+							type="password"
 							required
 						></v-text-field>
 						<v-checkbox 
@@ -36,41 +34,8 @@
 						<router-link class="mb-2" to="/session/forgot-password">{{$t('message.forgotPassword')}}?</router-link>
 						<div>
 							<v-btn large @click="login" block color="primary" class="mb-2">{{$t('message.loginNow')}}</v-btn>
-							<v-btn large @click="onCreateAccount" block color="warning" class="mb-2">{{$t('message.createAccount')}}</v-btn>
 						</div>
-						<p>{{$t('message.bySigningUpYouAgreeTo')}} {{brand}}</p>
-						<router-link to="">{{$t('message.termsOfService')}}</router-link>
 					</v-form>
-					<div class="session-social-links d-inline-block">
-						<ul class="list-unstyled mb-2">
-							<li @click="signInWithFacebook">
-								<span class="facebook-bg session-icon">
-									<i class="ti-facebook"></i>
-								</span>
-							</li>
-							<li @click="signInWithGoogle">
-								<span class="google-bg session-icon">
-									<i class="ti-google"></i>
-								</span>
-							</li>
-							<li @click="signInWithTwitter">
-								<span class="twitter-bg session-icon">
-									<i class="ti-twitter-alt"></i>
-								</span>
-							</li>
-							<li @click="signInWithGithub">
-								<span class="github-bg session-icon">
-									<i class="ti-github"></i>
-								</span>
-							</li>
-						</ul>
-						<v-btn 
-							color="error" 
-							@click="signinWithAuth0"
-						>
-							Signin With Auth0
-						</v-btn>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -82,13 +47,9 @@
 // import { mapGetters } from "vuex";
 import SessionSliderWidget from "Components/Widgets/SessionSlider";
 import AppConfig from "Constants/AppConfig";
+import Vue from 'vue';
 
-import AuthService from "../../auth/AuthService";
-
-const auth = new AuthService();
 // const { login, logout, authenticated, authNotifier } = auth;
-
-const { login} = auth;
 
 export default {
   components: {
@@ -98,50 +59,40 @@ export default {
     return {
       checkbox: false,
       valid: false,
-      email: "demo@example.com",
-      emailRules: [
-        v => !!v || "E-mail is required",
-        v =>
-          /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
-          "E-mail must be valid"
-      ],
-      password: "test#123",
-      passwordRules: [v => !!v || "Password is required"],
+      username: "admin",
+      password: "admin",
       appLogo: AppConfig.appLogo2,
       brand: AppConfig.brand
     };
   },
   methods: {
-	login(){
-		this.$store.dispatch("login");
-	},
-    submit() {
+    async login() {
       const user = {
-        email: this.email,
+        username: this.username,
         password: this.password
-			};
-			
-      this.$store.dispatch("signinUserInFirebase", {
-        user
-      });
-    },
-    signInWithFacebook() {
-      this.$store.dispatch("signinUserWithFacebook");
-    },
-    signInWithGoogle() {
-      this.$store.dispatch("signinUserWithGoogle");
-    },
-    signInWithTwitter() {
-      this.$store.dispatch("signinUserWithTwitter");
-    },
-    signInWithGithub() {
-      this.$store.dispatch("signinUserWithGithub");
-    },
-    onCreateAccount() {
-      this.$router.push("/session/sign-up");
-    },
-    signinWithAuth0() {
-      login();
+      };
+      const loginResult = await this.$axios.post('/login', user)
+      
+      if (loginResult.status === 200) { //loginResult.status === 200
+        const { data } = loginResult
+        localStorage.setItem('jwt', data)
+        localStorage.setItem('user', user)
+        this.$axios.defaults.headers.common['Authorization'] = data;
+        this.$router.push("/default/dashboard/ecommerce");
+        Vue.notify({
+          group: 'loggedIn',
+          type: 'success',
+          text: 'Đăng nhập thành công!'
+        })
+      } 
+      else {
+        Vue.notify({
+          group: 'loggedIn',
+          type: 'error',
+          text: 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu'
+        })
+      }
+      console.log(79, localStorage.getItem('jwt'))
     }
   }
 };

@@ -583,5 +583,7 @@ export default {
   simpleTable: "Simple Table",
   listItemGroups: "List Item Groups",
   banners: "Banners",
-  appBars: "App Bars"
+  appBars: "App Bars",
+  gateway: "Login to Gateway",
+  gatewayLoginNotice: "Enter username and password to login to Gateway."
 }
