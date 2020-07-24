@@ -586,5 +586,6 @@ export default {
   appBars: "App Bars",
   gateway: "Login to Gateway",
   gatewayLoginNotice: "Enter username and password to login to Gateway.",
-  deviceList: "Device List"
+  deviceList: "Device List",
+  usersTitle: "Users"
 }

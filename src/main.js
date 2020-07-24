@@ -77,12 +77,19 @@ router.afterEach(() => {
 	}, 200);
 })
 
+const axiosInstance = axios.create({
+	baseURL: 'http://localhost:5566'
+})
+
+axiosInstance.interceptors.request.use(function (config) {
+    const token = localStorage.getItem('jwt')
+    config.headers.Authorization =  token ? `Bearer ${token}` : ''
+    return config;
+});
 
 Vue.use({
     install (Vue) {
-    Vue.prototype.$axios = axios.create({
-      baseURL: 'http://localhost:5566'
-    })
+    Vue.prototype.$axios = axiosInstance
   }
 })
 

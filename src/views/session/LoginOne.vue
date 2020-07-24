@@ -77,7 +77,7 @@ export default {
         const { data } = loginResult
         localStorage.setItem('jwt', data)
         localStorage.setItem('user', user)
-        this.$axios.defaults.headers.common['Authorization'] = data
+        this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + data
         this.$router.push("/dashboard/device")
         Vue.notify({
           group: 'loggedIn',
