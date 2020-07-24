@@ -3,6 +3,7 @@ import Full from 'Container/Full'
 // dashboard components
 const Crypto = () => import('Views/crypto/Crypto');
 const Ecommerce = () => import('Views/dashboard/Ecommerce');
+const Device = () => import('Views/dashboard/Device');
 const WebAnalytics = () => import('Views/dashboard/WebAnalytics');
 const Magazine = () => import('Views/dashboard/Magazine');
 const News = () => import('Views/dashboard/News');
@@ -149,8 +150,17 @@ const Dropzone = () => import('Views/extensions/Dropzone');
 export default {
    path: '/',
    component: Full,
-   redirect: '/default/dashboard/ecommerce',
+   redirect: '/dashboard/device',
    children: [
+      {
+        path: '/dashboard/device',
+        component: Device,
+        meta: {
+          requiresAuth: true,
+          title: 'message.ecommerce',
+          breadcrumb: null
+        }
+      },
       {
          path: '/default/dashboard/ecommerce',
          component: Ecommerce,

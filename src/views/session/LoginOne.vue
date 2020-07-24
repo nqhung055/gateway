@@ -77,8 +77,8 @@ export default {
         const { data } = loginResult
         localStorage.setItem('jwt', data)
         localStorage.setItem('user', user)
-        this.$axios.defaults.headers.common['Authorization'] = data;
-        this.$router.push("/default/dashboard/ecommerce");
+        this.$axios.defaults.headers.common['Authorization'] = data
+        this.$router.push("/dashboard/device")
         Vue.notify({
           group: 'loggedIn',
           type: 'success',
@@ -92,7 +92,6 @@ export default {
           text: 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu'
         })
       }
-      console.log(79, localStorage.getItem('jwt'))
     }
   }
 };
