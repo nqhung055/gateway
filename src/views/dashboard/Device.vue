@@ -7,7 +7,7 @@
 					:fullBlock="true"
 					colClasses="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12"
 				>
-        <v-btn color="success " @click="createNewUser(item)">Create User</v-btn>
+        <v-btn color="success " @click="showNewUserDialog = true">Create User</v-btn>
         <v-select
           outlined
           v-model="selectedDevice"
@@ -40,13 +40,202 @@
 				</app-card>
 			</v-row>
 		</v-container>
+    <v-dialog v-model="showNewUserDialog" max-width="900px" max-height="1000px">
+      <v-card>
+				<v-card-title>
+					<span class="headline">{{$t('message.addNewUser')}}</span>
+				</v-card-title>
+				<v-card-text>
+					<v-container class="grid-list-md pa-0">            
+            <v-row>
+							<v-col cols="12">
+								<v-select v-model="newUser.devices" :items="devices" label="Add to Devices" multiple>
+                  <template v-slot:prepend-item>
+                  <v-list-item
+                    ripple
+                    @click="selectAllDevices"
+                  >
+                    <v-list-item-action>
+                      <v-icon :color="newUser.devices.length > 0 ? 'indigo darken-4' : ''">{{ icon }}</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                      <v-list-item-title>Select All</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-divider class="mt-2"></v-divider>
+                </template>
+								</v-select>
+							</v-col>
+						</v-row>
+            <v-row>
+							<v-col cols="12">
+                <files-uploaded></files-uploaded>
+							</v-col>
+            </v-row>
+						<v-row>
+							<v-col cols="6">
+								<v-text-field :label="$t('message.userId')" v-model="newUser.userId"></v-text-field>
+							</v-col>
+							<v-col cols="6">
+								<div>
+									<v-text-field :label="$t('message.name')" v-model="newUser.name"></v-text-field>
+								</div>
+							</v-col>
+						</v-row>
+            <v-row>
+							<v-col cols="6">
+								<v-text-field :label="$t('message.phone')" v-model="newUser.phone"></v-text-field>
+							</v-col>
+							<v-col cols="6">
+								<div>
+									<v-text-field :label="$t('message.userType')" v-model="newUser.userType"></v-text-field>
+								</div>
+							</v-col>
+						</v-row>
+            <v-row>
+							<v-col cols="6">
+								<v-text-field type="number" :label="$t('message.confidenceLevel')" v-model="newUser.confidenceLevel"></v-text-field>
+							</v-col>
+							<v-col cols="6">
+								<div>
+									<v-text-field :label="$t('message.ic')" v-model="newUser.ic"></v-text-field>
+								</div>
+							</v-col>
+						</v-row>
+            <v-row>
+							<v-col cols="6">
+                <v-menu
+                  v-model="isShowEffectFromPanel"
+                  :close-on-content-click="false"
+                  :nudge-right="40"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="290px"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field 
+                      v-model="newUser.effectFrom" 
+                      :label="$t('message.effectFrom')" 
+                      prepend-icon="event" 
+                      readonly 
+                      v-bind="attrs" 
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                    v-model="newUser.effectFrom"
+                    @input="isShowEffectFromPanel=false"
+                  ></v-date-picker>
+                </v-menu>
+							</v-col>
+              <v-col cols="6">
+                <v-menu ref="effectFromMenu"
+                  v-model="isShowEffectFromMinutePanel"
+                  :close-on-content-click="false"
+                  :nudge-right="40"
+                  :return-value.sync="effectFromStringMinute"
+                  transition="scale-transition"
+                  offset-y
+                  max-width="290px"
+                  min-width="290px"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="effectFromStringMinute"
+                      label="Time"
+                      prepend-icon="access_time"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                    </v-text-field>
+                  </template>
+                  <v-time-picker
+                    v-if="isShowEffectFromMinutePanel"
+                    v-model="effectFromStringMinute"
+                    full-width
+                    @click:minute="$refs.effectFromMenu.save(effectFromStringMinute)"
+                  ></v-time-picker>
+                </v-menu>
+              </v-col>
+						</v-row>
+            <v-row>
+              <v-col cols="6">
+                <v-menu
+                  v-model="isShowExpiredAtPanel"
+                  :close-on-content-click="false"
+                  :nudge-right="40"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="290px"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="newUser.expiredAt"
+                      :label="$t('message.expiredAt')"
+                      prepend-icon="event"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                    v-model="newUser.expiredAt"
+                    @input="isShowExpiredAtPanel=false"
+                  ></v-date-picker>
+                </v-menu>
+              </v-col>
+              <v-col cols="6">
+                <v-menu ref="expiredAtMenu"
+                  v-model="isShowExpiredAtMinutePanel"
+                  :close-on-content-click="false"
+                  :nudge-right="40"
+                  :return-value.sync="expiredAtStringMinute"
+                  transition="scale-transition"
+                  offset-y
+                  max-width="290px"
+                  min-width="290px"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="expiredAtStringMinute"
+                      label="Time"
+                      prepend-icon="access_time"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                    </v-text-field>
+                  </template>
+                  <v-time-picker
+                    v-if="isShowExpiredAtMinutePanel"
+                    v-model="expiredAtStringMinute"
+                    full-width
+                    @click:minute="$refs.expiredAtMenu.save(expiredAtStringMinute)"
+                  ></v-time-picker>
+                </v-menu>
+              </v-col>
+            </v-row>
+					</v-container>
+				</v-card-text>
+				<v-card-actions class="pa-4">
+					<v-spacer></v-spacer>
+					<v-btn class="px-4" color="success" v-on:click="addNewUser">{{$t('message.add')}}</v-btn>
+					<v-btn class="px-4" color="error" @click.native="showNewUserDialog = false">{{$t('message.close')}}</v-btn>
+				</v-card-actions>
+			</v-card>
+    </v-dialog>
 	</div>
 </template>
 
 <script>
 import Vue from 'vue';
+import FilesUploaded from 'Components/Widgets/FilesUploaded'
 
 export default {
+  components: {
+    FilesUploaded
+  },
   data() {
     return {
       loader: true,
@@ -69,11 +258,34 @@ export default {
       ],
       devices: [],
       users: [],
-      selectedDevice: ""
+      selectedDevice: "",
+      showNewUserDialog: false,
+      newUser: {
+        devices: []
+      },
+      isShowEffectFromPanel: false,
+      isShowEffectFromMinutePanel: false,
+      isShowExpiredAtPanel: false,
+      isShowExpiredAtMinutePanel: false,
+      effectFromStringMinute: "",
+      expiredAtStringMinute: "",
     };
   },
   mounted() {
     this.getDevices();
+  },
+  computed: {
+    cSelectAllDevices () {
+      return this.newUser.devices.length === this.devices.length
+    },
+    cSelectSomeDevices () {
+      return this.newUser.devices.length > 0 && !this.cSelectAllDevices
+    },
+    icon () {
+      if (this.cSelectAllDevices) return 'mdi-close-box'
+      if (this.cSelectSomeDevices) return 'mdi-minus-box'
+      return 'mdi-checkbox-blank-outline'
+    },
   },
   methods: {
     async changeSelectedDevice() {
@@ -88,13 +300,38 @@ export default {
           })
         }
     },
-    async createNewUser() {
-      console.log(7777777777);
+    async addNewUser() {
+      this.newUser = {
+        ...this.newUser,
+        expiredAt: this.newUser.expiredAt + ' ' + this.expiredAtStringMinute,
+        effectFrom: this.newUser.effectFrom + ' ' + this.effectFromStringMinute
+      }
+
+      const addResponse = await this.$axios.post('/upload/user', this.newUser)
+      if (addResponse.status === 200) {
+        this.newUser = {}
+        this.showNewUserDialog = false
+        if (this.selectedDevice) {
+          this.changeSelectedDevice()
+        }
+        Vue.notify({
+          group: 'loggedIn',
+          type: 'success',
+          text: 'Thêm user thành công!'
+        })
+      } else {
+        Vue.notify({
+          group: 'loggedIn',
+          type: 'error',
+          text: 'Có lỗi khi thêm người dùng. Vui lòng thử lại sau!'
+        })
+      }
     },
     async removeUser(user) {
       const deleteResponse = await this.$axios.delete(`/delete/user`, { params: { userId: user.userId, deviceId: this.selectedDevice } })
       if (deleteResponse.status === 200) {
         this.users = this.users.filter(holdUser => holdUser.userId !== user.userId)
+        this.showNewUserDialog = false
         Vue.notify({
           group: 'loggedIn',
           type: 'success',
@@ -119,6 +356,15 @@ export default {
           text: 'Không thể lấy danh sách thiết bị. Vui lòng tải lại trang!'
         })
       }
+    },
+    selectAllDevices() {
+      this.$nextTick(() => {
+          if (this.cSelectAllDevices) {
+            this.newUser.devices = []
+          } else {
+            this.newUser.devices = this.devices.slice()
+          }
+        })
     }
   }
 };

@@ -587,5 +587,11 @@ export default {
   gateway: "Login to Gateway",
   gatewayLoginNotice: "Enter username and password to login to Gateway.",
   deviceList: "Device List",
-  usersTitle: "Users"
+  usersTitle: "Users",
+  userId: "User ID",
+  expiredAt: "Expired At",
+  effectFrom: "Effect From",
+  userType: "User Type",
+  confidenceLevel: "Confidence Level",
+  ic: "IC Card"
 }

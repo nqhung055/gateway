@@ -73,7 +73,7 @@ export default {
       };
       const loginResult = await this.$axios.post('/login', user)
       
-      if (loginResult.status === 200) { //loginResult.status === 200
+      if (loginResult.status === 200) {
         const { data } = loginResult
         localStorage.setItem('jwt', data)
         localStorage.setItem('user', user)
