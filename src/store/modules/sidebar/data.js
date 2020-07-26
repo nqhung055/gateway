@@ -1,13 +1,12 @@
 // Sidebar Routers
 export const menus = {
-	'message.general': [
+	'message.menu': [
 		{
-			action: 'zmdi-view-dashboard',
-			title: 'message.dashboard',
+			action: 'zmdi zmdi-account',
+			title: 'message.users',
 			active: true,
-			label: 'New',
 			items: [
-				{ title: 'message.device', path: '/dashboard/device', exact: true,label: 'Old' }
+				// { title: 'message.device', path: '/dashboard/device', exact: true,label: 'Old' }
 			]
 		}
 	]

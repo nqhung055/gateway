@@ -7,40 +7,58 @@
 					:fullBlock="true"
 					colClasses="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12"
 				>
-        <v-btn color="success " @click="showNewUserDialog = true">Create User</v-btn>
-        <v-row>
-          <v-col cols="3">
-            <v-select
-              outlined
-              v-model="selectedDevice"
-              :items="devices"
-              label="Select Device"
-              @change="changeSelectedDevice()"
-            ></v-select>
-          </v-col>
-        </v-row>
-					<v-data-table
-						:headers="headers"
-						:items="users"
-						item-key="userId"
-					>
-					<template slot="headerCell" slot-scope="props">
-						<v-tooltip bottom>
-							<span slot="activator">
-								{{ props.header.text }}
-							</span>
-							<span>
-								{{ props.header.text }}
-							</span>
-						</v-tooltip>
-					</template>
-					<template slot="items" slot-scope="props">
-						<td>{{ props.item.name }}</td>
-					</template>
-          <template v-slot:item.action="{ item }">
-            <v-btn color="error" @click="removeUser(item)">Remove</v-btn>
-          </template>
-					</v-data-table>
+          <v-row>
+            <v-col cols="12">  
+              <v-btn color="success " @click="showNewUserDialog = true">Create User</v-btn>
+            </v-col>
+          </v-row>
+          <v-card>
+            <v-card-title>
+              <v-row>
+                <v-col cols="4">                    
+                </v-col>
+                <v-col cols="2">
+                  <v-select
+                    v-model="selectedDevice"
+                    :items="devices"
+                    label="Select Device"
+                    @change="changeSelectedDevice()"
+                  ></v-select>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="searchUserKey"
+                    append-icon="mdi-magnify"
+                    label="Search"
+                    single-line
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-card-title>
+              <v-data-table
+                :headers="headers"
+                :items="users"
+                :search="searchUserKey"
+                item-key="userId">
+                <template slot="headerCell" slot-scope="props">
+                  <v-tooltip bottom>
+                    <span slot="activator">
+                      {{ props.header.text }}
+                    </span>
+                    <span>
+                      {{ props.header.text }}
+                    </span>
+                  </v-tooltip>
+                </template>
+                <template slot="items" slot-scope="props">
+                  <td>{{ props.item.name }}</td>
+                </template>
+                <template v-slot:item.action="{ item }">
+                  <v-btn color="error" @click="removeUser(item)"><v-icon>ti-trash</v-icon></v-btn>
+                </template>
+              </v-data-table>
+          </v-card>
 				</app-card>
 			</v-row>
 		</v-container>
@@ -113,13 +131,19 @@
                 </v-col>
                 <v-col cols="6">
                   <div>
-                    <v-text-field :label="$t('message.userType')" v-model="newUser.userType"></v-text-field>
+                    <v-select
+                      v-model="newUser.userType"
+                      :items="userTypes"
+                      item-text="text"
+                      item-value="value"
+                      :label="$t('message.userType')"
+                    ></v-select>
                   </div>
                 </v-col>
               </v-row>
               <v-row>
                 <v-col cols="6">
-                  <v-text-field type="number" :label="$t('message.confidenceLevel')" v-model="newUser.confidenceLevel"></v-text-field>
+                  <v-text-field type="number" :label="$t('message.confidenceLevel')" v-model="newUser.confidenceLevel" :rules="newUserRules.confidenceLevel"></v-text-field>
                 </v-col>
                 <v-col cols="6">
                   <div>
@@ -261,7 +285,7 @@ export default {
   data() {
     return {
       loader: true,
-      search: "",
+      searchUserKey: "",
       headers: [
         {
           text: "ID",
@@ -276,14 +300,26 @@ export default {
           sortable: false,
           value: "name",
         },
-        { text: 'Action', align: "center", value: 'action', width: "10%" },
+        { text: 'Action', align: "left", value: 'action', width: "10%" },
+      ],
+      userTypes: [
+        {
+          text: "Face only",
+          value: 0
+        },
+        {
+          text: "Face and Card",
+          value: 1
+        }
       ],
       devices: [],
       users: [],
       selectedDevice: "",
       showNewUserDialog: false,
       newUser: {
-        devices: []
+        devices: [],
+        confidenceLevel: 80,
+        userType: 0
       },
       isShowEffectFromPanel: false,
       isShowEffectFromMinutePanel: false,
@@ -309,6 +345,10 @@ export default {
         ic: [ 
           ic => !!ic || 'IC Card is required',
         ],
+        confidenceLevel: [
+          confidenceLevel => !isNaN(confidenceLevel) || 'ConfidenceLevel must be a number',
+          confidenceLevel => (confidenceLevel > 0 && confidenceLevel < 100) || 'ConfidenceLevel must between 0 and 100'
+        ]
       }
     }
   },
@@ -349,13 +389,15 @@ export default {
           Vue.notify({
             group: 'loggedIn',
             type: 'error',
-            text: 'Không thể lấy danh sách người dùng. Vui lòng thử lại sau!'
+            text: 'Can not get User list. Please try again later!'
           })
         }
     },
     renewUser() {
       this.newUser = {
         devices: [],
+        confidenceLevel: 80,
+        userType: 0,
         name: "",
         userId: "",
         expiredAt: "",
@@ -384,13 +426,13 @@ export default {
         Vue.notify({
           group: 'loggedIn',
           type: 'success',
-          text: 'Thêm user thành công!'
+          text: 'Create User successful!'
         })
       } else {
         Vue.notify({
           group: 'loggedIn',
           type: 'error',
-          text: 'Có lỗi khi thêm người dùng. Vui lòng thử lại sau!'
+          text: 'Create user fail. Please try again later!'
         })
       }
     },
@@ -402,13 +444,13 @@ export default {
         Vue.notify({
           group: 'loggedIn',
           type: 'success',
-          text: 'Xóa người dùng thành công!'
+          text: 'Remove user successful!'
         })
       } else {
         Vue.notify({
           group: 'loggedIn',
           type: 'error',
-          text: 'Có lỗi khi xóa người dùng. Vui lòng thử lại sau!'
+          text: 'Remove user fail. Please try again later!'
         })
       }
     },    
@@ -420,7 +462,7 @@ export default {
         Vue.notify({
           group: 'loggedIn',
           type: 'error',
-          text: 'Không thể lấy danh sách thiết bị. Vui lòng tải lại trang!'
+          text: 'Can not get Devive list. Please reload page!'
         })
       }
     },

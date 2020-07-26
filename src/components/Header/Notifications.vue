@@ -2,7 +2,10 @@
 	<v-menu offset-y left origin="right top" z-index="99" content-class="notification-dropdown" transition="slide-y-transition" nudge-top="-10">
 		<template v-slot:activator="{ on }">
 			<v-btn class="notification-icon ma-0" v-on="on" icon large >
-				<i class="zmdi grey--text zmdi-notifications-active animated infinite wobble zmdi-hc-fw font-lg"></i>
+				<v-badge right overlap>
+					<span slot="badge">5</span>
+					<i class="zmdi grey--text zmdi-notifications-active infinite wobble zmdi-hc-fw font-lg"></i>
+				</v-badge>
 			</v-btn>
 		</template>
 		<div class="dropdown-content">

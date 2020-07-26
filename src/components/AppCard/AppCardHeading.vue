@@ -1,6 +1,6 @@
 <template>
 	<div class="app-card-title" v-if="heading">
-		<h3>{{heading}}</h3>
+		<h1>{{heading}}</h1>
 		<template v-if="!withTabs">
 			<div class="app-contextual-link" v-if="fullScreen || reloadable || closeable">
 				<v-menu

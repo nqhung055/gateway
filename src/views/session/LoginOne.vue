@@ -26,12 +26,6 @@
 							type="password"
 							required
 						></v-text-field>
-						<v-checkbox 
-							color="primary" 
-							label="Remember me" 
-							v-model="checkbox"
-						></v-checkbox>
-						<router-link class="mb-2" to="/session/forgot-password">{{$t('message.forgotPassword')}}?</router-link>
 						<div>
 							<v-btn large @click="login" block color="primary" class="mb-2">{{$t('message.loginNow')}}</v-btn>
 						</div>
@@ -82,14 +76,14 @@ export default {
         Vue.notify({
           group: 'loggedIn',
           type: 'success',
-          text: 'Đăng nhập thành công!'
+          text: 'Login successful!'
         })
       } 
       else {
         Vue.notify({
           group: 'loggedIn',
           type: 'error',
-          text: 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu'
+          text: 'Login fail. Please check your username and password!'
         })
       }
     }

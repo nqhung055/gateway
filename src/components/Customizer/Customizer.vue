@@ -90,11 +90,6 @@
 				</v-tab-item>
 			</v-tabs>
 		</v-navigation-drawer>
-		<div class="app-customizer">
-			<a class="customizer-toggle primary v-step-4" href="javascript:;" @click="toggleCustomizer">
-				<i class="zmdi zmdi-settings zmdi-hc-spin font-lg"></i>
-			</a>
-		</div>
 	</div>
 </template>
 
