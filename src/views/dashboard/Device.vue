@@ -44,7 +44,7 @@
 				</app-card>
 			</v-row>
 		</v-container>
-    <v-dialog v-model="showNewUserDialog" max-width="900px" max-height="1000px">
+    <v-dialog v-model="showNewUserDialog" max-width="900px" max-height="1000px" :fullscreen="true">
       <v-card>
 				<v-card-title>
 					<span class="headline">{{$t('message.addNewUser')}}</span>
