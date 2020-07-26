@@ -84,8 +84,19 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(function (config) {
     const token = localStorage.getItem('jwt')
     config.headers.Authorization =  token ? `Bearer ${token}` : ''
-    return config;
-});
+    return config
+})
+
+axiosInstance.interceptors.response.use(function (response) {
+	return response 
+}, function (error) {
+    if (error.response.status === 401) {
+		localStorage.setItem('jwt', null)
+		localStorage.setItem('user', null)
+		router.push("/session/login")
+	}
+    return Promise.reject(error);
+})
 
 Vue.use({
     install (Vue) {

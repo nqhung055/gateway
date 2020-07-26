@@ -593,5 +593,7 @@ export default {
   effectFrom: "Effect From",
   userType: "User Type",
   confidenceLevel: "Confidence Level",
-  ic: "IC Card"
+  ic: "IC Card",
+  device: "Device",
+  facePhoto: "Face Photo"
 }

@@ -8,13 +8,17 @@
 					colClasses="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12"
 				>
         <v-btn color="success " @click="showNewUserDialog = true">Create User</v-btn>
-        <v-select
-          outlined
-          v-model="selectedDevice"
-          :items="devices"
-          label="Select Device"
-          @change="changeSelectedDevice()"
-        ></v-select>
+        <v-row>
+          <v-col cols="3">
+            <v-select
+              outlined
+              v-model="selectedDevice"
+              :items="devices"
+              label="Select Device"
+              @change="changeSelectedDevice()"
+            ></v-select>
+          </v-col>
+        </v-row>
 					<v-data-table
 						:headers="headers"
 						:items="users"
@@ -68,20 +72,35 @@
 							</v-col>
 						</v-row>
             <v-row>
-							<v-col cols="12">
-                <files-uploaded></files-uploaded>
+							<v-col cols="4">
+                <v-row>
+                  <v-col cols="12" align="center">
+                    <v-img :src="srcFacePhoto" width="100" height="150"></v-img>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-file-input 
+                      :label="$t('message.facePhoto')"
+                      filled
+                      v-model="facePhoto"
+                      prepend-icon="mdi-camera"
+                      @change="uploadFile()"
+                    ></v-file-input>
+                  </v-col>
+                </v-row>
 							</v-col>
+              <v-col cols="8">
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field :label="$t('message.userId')" v-model="newUser.userId"></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <div>
+                      <v-text-field :label="$t('message.name')" v-model="newUser.name"></v-text-field>
+                    </div>
+                  </v-col>
+                </v-row>
+              </v-col>
             </v-row>
-						<v-row>
-							<v-col cols="6">
-								<v-text-field :label="$t('message.userId')" v-model="newUser.userId"></v-text-field>
-							</v-col>
-							<v-col cols="6">
-								<div>
-									<v-text-field :label="$t('message.name')" v-model="newUser.name"></v-text-field>
-								</div>
-							</v-col>
-						</v-row>
             <v-row>
 							<v-col cols="6">
 								<v-text-field :label="$t('message.phone')" v-model="newUser.phone"></v-text-field>
@@ -230,12 +249,8 @@
 
 <script>
 import Vue from 'vue';
-import FilesUploaded from 'Components/Widgets/FilesUploaded'
 
 export default {
-  components: {
-    FilesUploaded
-  },
   data() {
     return {
       loader: true,
@@ -269,6 +284,8 @@ export default {
       isShowExpiredAtMinutePanel: false,
       effectFromStringMinute: "",
       expiredAtStringMinute: "",
+      facePhoto: {},
+      srcFacePhoto: ""
     };
   },
   mounted() {
@@ -288,6 +305,18 @@ export default {
     },
   },
   methods: {
+    async uploadFile() {
+      if (this.facePhoto) {
+        const reader = new FileReader();
+        reader.addEventListener("load",  () => {
+          this.srcFacePhoto = reader.result;
+        }, false)
+  
+        reader.readAsDataURL(this.facePhoto)
+      } else {
+        this.srcFacePhoto = ""
+      }
+    },
     async changeSelectedDevice() {
       const usersResponse = await this.$axios.get(`/get/user/list/of/${this.selectedDevice}`)
         if (usersResponse.status === 200) {
@@ -300,16 +329,24 @@ export default {
           })
         }
     },
+    renewUser() {
+      this.newUser = {
+        devices: []
+      }
+      this.srcFacePhoto = ""
+      this.facePhoto = {}
+    },
     async addNewUser() {
       this.newUser = {
         ...this.newUser,
         expiredAt: this.newUser.expiredAt + ' ' + this.expiredAtStringMinute,
-        effectFrom: this.newUser.effectFrom + ' ' + this.effectFromStringMinute
+        effectFrom: this.newUser.effectFrom + ' ' + this.effectFromStringMinute,
+        facePhoto: this.srcFacePhoto
       }
 
       const addResponse = await this.$axios.post('/upload/user', this.newUser)
       if (addResponse.status === 200) {
-        this.newUser = {}
+        this.renewUser()
         this.showNewUserDialog = false
         if (this.selectedDevice) {
           this.changeSelectedDevice()
