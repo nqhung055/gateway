@@ -90,7 +90,7 @@ axiosInstance.interceptors.request.use(function (config) {
 axiosInstance.interceptors.response.use(function (response) {
 	return response 
 }, function (error) {
-    if (error.response.status === 401) {
+    if (error.response && error.response.status === 401) {
 		localStorage.setItem('jwt', null)
 		localStorage.setItem('user', null)
 		router.push("/session/login")
