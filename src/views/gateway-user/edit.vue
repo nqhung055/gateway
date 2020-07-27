@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog :value="isShowPopup" :persistent="true" max-width="900px" max-height="1000px" :fullscreen="true">
+    <v-dialog :value="isShowPopup" :persistent="true" max-width="1600px" max-height="1000px">
       <v-card>
 				<v-card-title>
 					<span class="headline">{{$t('message.editUser')}}</span>
@@ -45,91 +45,27 @@
                         <v-text-field :label="$t('message.ic')" v-model="editUser.ic" :rules="editUserRules.ic" required></v-text-field>
                       </div>
                     </v-col>
+                  </v-row>
+                </v-col>
+                <v-col cols="6">
+                  <v-row>
                     <v-col cols="12">
                       <v-row>
-                        <v-col cols="5">
-                          <v-select
-                            v-model="editUser.allowPeriods"
-                            :items="editUser.allowPeriods"
-                            :label="$t('message.allowPeriods')"
-                            :item-text="period => period.startTime + '-' + period.endTime"
-                            attach
-                            chips                                              
-                            multiple
-                            :cache-items="true"
-                          >
-                            <template slot="item" slot-scope="props">
-                              {{ props.item.startTime + ' - ' + props.item.endTime }}
-                            </template>
-                            <template slot="prepend" slot-scope="props">
-                              {{ props.item.startTime + ' - ' + props.item.endTime }}
-                            </template>
-                            
-                          </v-select>
+                        <v-col cols="12" align="center">
+                          <v-img :src="editUser.facePhoto" width="100" height="124"></v-img>
                         </v-col>
-                        <v-col cols="3">
-                          <v-menu ref="startTime"
-                            v-model="isShowStartTime"
-                            :close-on-content-click="false"
-                            :return-value.sync="startTime"
-                            transition="scale-transition"
-                            offset-y
-                            max-width="290px"
-                            min-width="290px"
-                          >
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-text-field
-                                v-model="startTime"
-                                label="Start time"
-                                prepend-icon="access_time"
-                                readonly
-                                v-bind="attrs"
-                                v-on="on"
-                              >
-                              </v-text-field>
-                            </template>
-                            <v-time-picker
-                              v-if="isShowStartTime"
-                              v-model="startTime"
-                              full-width
-                              @click:minute="$refs.startTime.save(startTime)"
-                            ></v-time-picker>
-                          </v-menu>
-                        </v-col>
-                        <v-col cols="3">
-                          <v-menu ref="endTime"
-                            v-model="isShowEndTime"
-                            :close-on-content-click="false"
-                            :return-value.sync="endTime"
-                            transition="scale-transition"
-                            offset-y
-                            max-width="290px"
-                            min-width="290px"
-                          >
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-text-field
-                                v-model="endTime"
-                                label="End time"
-                                prepend-icon="access_time"
-                                readonly
-                                v-bind="attrs"
-                                v-on="on"
-                              >
-                              </v-text-field>
-                            </template>
-                            <v-time-picker
-                              v-if="isShowEndTime"
-                              v-model="endTime"
-                              full-width
-                              @click:minute="$refs.endTime.save(endTime)"
-                            ></v-time-picker>
-                          </v-menu>
-                        </v-col>
-                        <v-col cols="1">
-                          <v-btn color="success" @click="addPeriod()"><v-icon>ti-plus</v-icon></v-btn>
+                        <v-col cols="12">
+                          <v-file-input 
+                            :label="$t('message.facePhoto')"
+                            filled
+                            v-model="facePhoto"
+                            prepend-icon="mdi-camera"
+                            @change="uploadFile()"
+                          ></v-file-input>
                         </v-col>
                       </v-row>
                     </v-col>
+                
                     <v-col cols="6">
                       <v-menu
                         v-model="isShowEffectFromPanel"
@@ -241,24 +177,87 @@
                       </v-menu>
                     </v-col>
                   </v-row>
-                </v-col>
-                <v-col cols="6">
                   <v-row>
-                    <v-col cols="12">
-                      <v-row>
-                        <v-col cols="12" align="center">
-                          <v-img :src="editUser.facePhoto" width="100" height="150"></v-img>
-                        </v-col>
-                        <v-col cols="12">
-                          <v-file-input 
-                            :label="$t('message.facePhoto')"
-                            filled
-                            v-model="facePhoto"
-                            prepend-icon="mdi-camera"
-                            @change="uploadFile()"
-                          ></v-file-input>
-                        </v-col>
-                      </v-row>
+                    <v-col cols="5">
+                      <v-select
+                        v-model="editUser.allowPeriods"
+                        :items="editUser.allowPeriods"
+                        :label="$t('message.allowPeriods')"
+                        :item-text="period => period.startTime + '-' + period.endTime"
+                        attach
+                        chips                                              
+                        multiple
+                        :cache-items="true"
+                      >
+                        <template slot="item" slot-scope="props">
+                          {{ props.item.startTime + ' - ' + props.item.endTime }}
+                        </template>
+                        <template slot="prepend" slot-scope="props">
+                          {{ props.item.startTime + ' - ' + props.item.endTime }}
+                        </template>
+                        
+                      </v-select>
+                    </v-col>
+                    <v-col cols="3">
+                      <v-menu ref="startTime"
+                        v-model="isShowStartTime"
+                        :close-on-content-click="false"
+                        :return-value.sync="startTime"
+                        transition="scale-transition"
+                        offset-y
+                        max-width="290px"
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="startTime"
+                            label="Start time"
+                            prepend-icon="access_time"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          >
+                          </v-text-field>
+                        </template>
+                        <v-time-picker
+                          v-if="isShowStartTime"
+                          v-model="startTime"
+                          full-width
+                          @click:minute="$refs.startTime.save(startTime)"
+                        ></v-time-picker>
+                      </v-menu>
+                    </v-col>
+                    <v-col cols="3">
+                      <v-menu ref="endTime"
+                        v-model="isShowEndTime"
+                        :close-on-content-click="false"
+                        :return-value.sync="endTime"
+                        transition="scale-transition"
+                        offset-y
+                        max-width="290px"
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="endTime"
+                            label="End time"
+                            prepend-icon="access_time"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          >
+                          </v-text-field>
+                        </template>
+                        <v-time-picker
+                          v-if="isShowEndTime"
+                          v-model="endTime"
+                          full-width
+                          @click:minute="$refs.endTime.save(endTime)"
+                        ></v-time-picker>
+                      </v-menu>
+                    </v-col>
+                    <v-col cols="1">
+                      <v-btn color="success" @click="addPeriod()"><v-icon>ti-plus</v-icon></v-btn>
                     </v-col>
                   </v-row>
                 </v-col>
@@ -268,7 +267,7 @@
 				</v-card-text>
 				<v-card-actions class="pa-4">
 					<v-spacer></v-spacer>
-					<v-btn class="px-4" color="success" v-on:click="editCurrentUser">{{$t('message.edit')}}</v-btn>
+					<v-btn class="px-4" color="success" v-on:click="editCurrentUser">{{$t('message.editBtn')}}</v-btn>
 					<v-btn class="px-4" color="error" @click.native="closePopup">{{$t('message.close')}}</v-btn>
           <v-spacer></v-spacer>
 				</v-card-actions>

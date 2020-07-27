@@ -596,5 +596,6 @@ export default {
   ic: "IC Card",
   device: "Device",
   facePhoto: "Face Photo",
-  allowPeriods: "Allow Periods"
+  allowPeriods: "Allow Periods",
+  editBtn: 'Update'
 }
