@@ -605,9 +605,9 @@ export default {
         ic: user.icCard,
         facePhoto: user.infoPhoto,
         allowPeriods: user.cycle ? JSON.parse(user.cycle) : undefined,
-        expiredAt: user.validUntil ? user.validUntil.substring(0, 10) : undefined,
+        expiredAt: (user.validUntil && user.validUntil !== 'forever') ? user.validUntil.substring(0, 10) : undefined,
       }
-      this.editUserExpiredAtStringMinute = user.validUntil ? user.validUntil.substring(11, 5) : ""
+      this.editUserExpiredAtStringMinute = (user.validUntil && user.validUntil !== 'forever') ? user.validUntil.substring(11, 5) : ""
       this.editedUser = editUser
     },
     addPeriod() {
