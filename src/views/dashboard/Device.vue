@@ -356,13 +356,26 @@
 				</v-card-actions>
 			</v-card>
     </v-dialog>
+    <edit-user
+      :isShowPopup="showEditUserDialog"
+      :device="devices"
+      :editUser="editedUser"
+      :userTypes="userTypes"
+      :effectFromStringMinute="editUserEffectFromStringMinute"
+      :expiredAtStringMinute="editUserExpiredAtStringMinute"
+      @updateSuccess="changeSelectedDevice()"
+      @closePopup="closePopupEditUser()"></edit-user>
 	</div>
 </template>
 
 <script>
 import Vue from 'vue';
+import editUser from '../gateway-user/edit'
 
 export default {
+  components: {
+    editUser
+  },
   data() {
     return {
       loader: true,
@@ -397,6 +410,7 @@ export default {
       users: [],
       selectedDevice: "",
       showNewUserDialog: false,
+      showEditUserDialog: false,
       newUser: {
         devices: [],
         confidenceLevel: 80,
@@ -440,7 +454,10 @@ export default {
           confidenceLevel => !isNaN(confidenceLevel) || 'ConfidenceLevel must be a number',
           confidenceLevel => (confidenceLevel > 0 && confidenceLevel < 100) || 'ConfidenceLevel must between 0 and 100'
         ]
-      }
+      },
+      editedUser: {},
+      editUserEffectFromStringMinute: "",
+      editUserExpiredAtStringMinute: "",
     }
   },
   mounted() {
@@ -576,14 +593,30 @@ export default {
         this.$refs.newUser.resetValidation()
       }
     },
-    editUser(user) {
-      console.log(887, user);
+    editUser(user) {      
+      this.showEditUserDialog = true
+
+      const editUser = {
+        userId: user.userId,
+        name: user.name,
+        phone: user.phone,
+        userType: parseInt(user.userType),
+        confidenceLevel: user.confidenceLevel,
+        ic: user.icCard,
+        facePhoto: user.infoPhoto,
+        allowPeriods: JSON.parse(user.cycle),
+        expiredAt: user.validUntil.substring(0, 10),
+      }
+      this.editUserExpiredAtStringMinute = user.validUntil.substring(11, 5)
+      this.editedUser = editUser
     },
     addPeriod() {
       this.newUser.allowPeriods = [...this.newUser.allowPeriods, { startTime: this.startTime, endTime: this.endTime }]
-      // this.newUser.allowPeriods.push({ startTime: this.startTime, endTime: this.endTime })
       this.startTime = ""
       this.endTime = ""
+    },
+    closePopupEditUser() {
+      this.showEditUserDialog = false
     }
   }
 };
