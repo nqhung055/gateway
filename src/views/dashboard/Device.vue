@@ -501,8 +501,7 @@ export default {
       this.srcFacePhoto = ""
       this.facePhoto = {}
     },
-    async addNewUser() {      
-      console.log(5555555, this.newUser)
+    async addNewUser() {
       if(!this.$refs.newUser.validate()) return
       this.newUser = {
         ...this.newUser,
