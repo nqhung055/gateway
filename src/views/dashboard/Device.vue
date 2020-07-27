@@ -595,6 +595,7 @@ export default {
     },
     editUser(user) {      
       this.showEditUserDialog = true
+      console.log(user);
 
       const editUser = {
         userId: user.userId,
@@ -604,10 +605,10 @@ export default {
         confidenceLevel: user.confidenceLevel,
         ic: user.icCard,
         facePhoto: user.infoPhoto,
-        allowPeriods: JSON.parse(user.cycle),
-        expiredAt: user.validUntil.substring(0, 10),
+        allowPeriods: user.cycle ? JSON.parse(user.cycle) : undefined,
+        expiredAt: user.validUntil ? user.validUntil.substring(0, 10) : undefined,
       }
-      this.editUserExpiredAtStringMinute = user.validUntil.substring(11, 5)
+      this.editUserExpiredAtStringMinute = user.validUntil ? user.validUntil.substring(11, 5) : ""
       this.editedUser = editUser
     },
     addPeriod() {

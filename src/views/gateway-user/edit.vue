@@ -335,8 +335,8 @@ export default {
         if(!this.$refs.editUser.validate()) return
         const editUser = {
           ...this.editUser,
-          expiredAt: this.editUser.expiredAt + ' ' + this.expiredAtStringMinute,
-          effectFrom: this.editUser.effectFrom + ' ' + this.effectFromStringMinute,
+          expiredAt: this.editUser.expiredAt ? this.editUser.expiredAt + ' ' + this.expiredAtStringMinute : undefined,
+          effectFrom: this.editUser.effectFrom ? this.editUser.effectFrom + ' ' + this.effectFromStringMinute : undefined,
         }
 
         const editResponse = await this.$axios.post('/upload/user', editUser)
