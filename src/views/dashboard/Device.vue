@@ -522,8 +522,8 @@ export default {
       if(!this.$refs.newUser.validate()) return
       this.newUser = {
         ...this.newUser,
-        expiredAt: this.newUser.expiredAt + ' ' + this.expiredAtStringMinute,
-        effectFrom: this.newUser.effectFrom + ' ' + this.effectFromStringMinute,
+        expiredAt: this.newUser.expiredAt ? this.newUser.expiredAt + ' ' + this.expiredAtStringMinute : undefined,
+        effectFrom: this.newUser.effectFrom ? this.newUser.effectFrom + ' ' + this.effectFromStringMinute : undefined,
         facePhoto: this.srcFacePhoto
       }
 
@@ -595,7 +595,6 @@ export default {
     },
     editUser(user) {      
       this.showEditUserDialog = true
-      console.log(user);
 
       const editUser = {
         userId: user.userId,
