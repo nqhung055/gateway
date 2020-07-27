@@ -594,9 +594,11 @@ export default {
       }
     },
     editUser(user) {      
+      console.log(597, user);
       this.showEditUserDialog = true
 
       const editUser = {
+        devices: [user.sn],
         userId: user.userId,
         name: user.name,
         phone: user.phone,
