@@ -594,7 +594,6 @@ export default {
       }
     },
     editUser(user) {      
-      console.log(597, user);
       this.showEditUserDialog = true
 
       const editUser = {
