@@ -9,7 +9,7 @@
 				>
           <v-row>
             <v-col cols="12">  
-              <v-btn color="success " @click="showNewUserDialog = true">Create User</v-btn>
+              <v-btn color="success " @click="showNewUserDialogMethod()">Create User</v-btn>
             </v-col>
           </v-row>
           <v-card>
@@ -18,7 +18,7 @@
                 <v-col cols="4">                    
                 </v-col>
                 <v-col cols="2">
-                  <v-select
+                  <v-select                    
                     v-model="selectedDevice"
                     :items="devices"
                     label="Select Device"
@@ -40,7 +40,8 @@
                 :headers="headers"
                 :items="users"
                 :search="searchUserKey"
-                item-key="userId">
+                item-key="userId"
+                @dblclick:row="(e, { item }) => editUser(item)">
                 <template slot="headerCell" slot-scope="props">
                   <v-tooltip bottom>
                     <span slot="activator">
@@ -74,46 +75,27 @@
               v-model="isNewUserValid"
               lazy-validation
             >
-              <v-row>
-                <v-col cols="12">
-                  <v-select v-model="newUser.devices" :items="devices" label="Add to Devices" multiple>
-                    <template v-slot:prepend-item>
-                    <v-list-item
-                      ripple
-                      @click="selectAllDevices"
-                    >
-                      <v-list-item-action>
-                        <v-icon :color="newUser.devices.length > 0 ? 'indigo darken-4' : ''">{{ icon }}</v-icon>
-                      </v-list-item-action>
-                      <v-list-item-content>
-                        <v-list-item-title>Select All</v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-divider class="mt-2"></v-divider>
-                  </template>
-                  </v-select>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="4">
+              <v-row>                
+                <v-col cols="6">
                   <v-row>
-                    <v-col cols="12" align="center">
-                      <v-img :src="srcFacePhoto" width="100" height="150"></v-img>
+                    <v-col cols="12" >
+                      <v-select v-model="newUser.devices" :items="devices" :rules="newUserRules.devices" label="Add to Devices" multiple>
+                        <template v-slot:prepend-item>
+                          <v-list-item
+                            ripple
+                            @click="selectAllDevices"
+                          >
+                            <v-list-item-action>
+                              <v-icon :color="newUser.devices.length > 0 ? 'indigo darken-4' : ''">{{ icon }}</v-icon>
+                            </v-list-item-action>
+                            <v-list-item-content>
+                              <v-list-item-title>Select All</v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                          <v-divider class="mt-2"></v-divider>
+                        </template>
+                      </v-select>
                     </v-col>
-                    <v-col cols="12">
-                      <v-file-input 
-                        :label="$t('message.facePhoto')"
-                        :rules="uploadRules"
-                        filled
-                        v-model="facePhoto"
-                        prepend-icon="mdi-camera"
-                        @change="uploadFile()"
-                      ></v-file-input>
-                    </v-col>
-                  </v-row>
-                </v-col>
-                <v-col cols="8">
-                  <v-row>
                     <v-col cols="12">
                       <v-text-field :label="$t('message.userId')" v-model="newUser.userId" :rules="newUserRules.id" required></v-text-field>
                     </v-col>
@@ -122,147 +104,245 @@
                         <v-text-field :label="$t('message.name')" v-model="newUser.name" :rules="newUserRules.name" required></v-text-field>
                       </div>
                     </v-col>
+                    <v-col cols="12">
+                      <v-text-field :label="$t('message.phone')" v-model="newUser.phone"></v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <div>
+                        <v-select
+                          v-model="newUser.userType"
+                          :items="userTypes"
+                          item-text="text"
+                          item-value="value"
+                          :label="$t('message.userType')"
+                        ></v-select>
+                      </div>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-text-field type="number" :label="$t('message.confidenceLevel')" v-model="newUser.confidenceLevel" :rules="newUserRules.confidenceLevel"></v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <div>
+                        <v-text-field :label="$t('message.ic')" v-model="newUser.ic" :rules="newUserRules.ic" required></v-text-field>
+                      </div>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-row>
+                        <v-col cols="5">
+                          <v-select
+                            v-model="newUser.allowPeriods"
+                            :items="newUser.allowPeriods"
+                            :label="$t('message.allowPeriods')"
+                            :item-text="period => period.startTime + '-' + period.endTime"
+                            attach
+                            chips                                              
+                            multiple
+                            :cache-items="true"
+                          >
+                            <template slot="item" slot-scope="props">
+                              {{ props.item.startTime + ' - ' + props.item.endTime }}
+                            </template>
+                            <template slot="prepend" slot-scope="props">
+                              {{ props.item.startTime + ' - ' + props.item.endTime }}
+                            </template>
+                            
+                          </v-select>
+                        </v-col>
+                        <v-col cols="3">
+                          <v-menu ref="startTime"
+                            v-model="isShowStartTime"
+                            :close-on-content-click="false"
+                            :return-value.sync="startTime"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                v-model="startTime"
+                                label="Start time"
+                                prepend-icon="access_time"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                              >
+                              </v-text-field>
+                            </template>
+                            <v-time-picker
+                              v-if="isShowStartTime"
+                              v-model="startTime"
+                              full-width
+                              @click:minute="$refs.startTime.save(startTime)"
+                            ></v-time-picker>
+                          </v-menu>
+                        </v-col>
+                        <v-col cols="3">
+                          <v-menu ref="endTime"
+                            v-model="isShowEndTime"
+                            :close-on-content-click="false"
+                            :return-value.sync="endTime"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                v-model="endTime"
+                                label="End time"
+                                prepend-icon="access_time"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                              >
+                              </v-text-field>
+                            </template>
+                            <v-time-picker
+                              v-if="isShowEndTime"
+                              v-model="endTime"
+                              full-width
+                              @click:minute="$refs.endTime.save(endTime)"
+                            ></v-time-picker>
+                          </v-menu>
+                        </v-col>
+                        <v-col cols="1">
+                          <v-btn color="success" @click="addPeriod()"><v-icon>ti-plus</v-icon></v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-menu
+                        v-model="isShowEffectFromPanel"
+                        :close-on-content-click="false"
+                        :nudge-right="40"
+                        transition="scale-transition"
+                        offset-y
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field 
+                            v-model="newUser.effectFrom" 
+                            :label="$t('message.effectFrom')" 
+                            prepend-icon="event" 
+                            readonly 
+                            v-bind="attrs" 
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="newUser.effectFrom"
+                          @input="isShowEffectFromPanel=false"
+                        ></v-date-picker>
+                      </v-menu>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-menu ref="effectFromMenu"
+                        v-model="isShowEffectFromMinutePanel"
+                        :close-on-content-click="false"
+                        :nudge-right="40"
+                        :return-value.sync="effectFromStringMinute"
+                        transition="scale-transition"
+                        offset-y
+                        max-width="290px"
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="effectFromStringMinute"
+                            label="Time"
+                            prepend-icon="access_time"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          >
+                          </v-text-field>
+                        </template>
+                        <v-time-picker
+                          v-if="isShowEffectFromMinutePanel"
+                          v-model="effectFromStringMinute"
+                          full-width
+                          @click:minute="$refs.effectFromMenu.save(effectFromStringMinute)"
+                        ></v-time-picker>
+                      </v-menu>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-menu
+                        v-model="isShowExpiredAtPanel"
+                        :close-on-content-click="false"
+                        :nudge-right="40"
+                        transition="scale-transition"
+                        offset-y
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="newUser.expiredAt"
+                            :label="$t('message.expiredAt')"
+                            prepend-icon="event"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="newUser.expiredAt"
+                          @input="isShowExpiredAtPanel=false"
+                        ></v-date-picker>
+                      </v-menu>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-menu ref="expiredAtMenu"
+                        v-model="isShowExpiredAtMinutePanel"
+                        :close-on-content-click="false"
+                        :nudge-right="40"
+                        :return-value.sync="expiredAtStringMinute"
+                        transition="scale-transition"
+                        offset-y
+                        max-width="290px"
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="expiredAtStringMinute"
+                            label="Time"
+                            prepend-icon="access_time"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          >
+                          </v-text-field>
+                        </template>
+                        <v-time-picker
+                          v-if="isShowExpiredAtMinutePanel"
+                          v-model="expiredAtStringMinute"
+                          full-width
+                          @click:minute="$refs.expiredAtMenu.save(expiredAtStringMinute)"
+                        ></v-time-picker>
+                      </v-menu>
+                    </v-col>
                   </v-row>
                 </v-col>
-              </v-row>
-              <v-row>
                 <v-col cols="6">
-                  <v-text-field :label="$t('message.phone')" v-model="newUser.phone"></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <div>
-                    <v-select
-                      v-model="newUser.userType"
-                      :items="userTypes"
-                      item-text="text"
-                      item-value="value"
-                      :label="$t('message.userType')"
-                    ></v-select>
-                  </div>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="6">
-                  <v-text-field type="number" :label="$t('message.confidenceLevel')" v-model="newUser.confidenceLevel" :rules="newUserRules.confidenceLevel"></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <div>
-                    <v-text-field :label="$t('message.ic')" v-model="newUser.ic" :rules="newUserRules.ic" required></v-text-field>
-                  </div>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="6">
-                  <v-menu
-                    v-model="isShowEffectFromPanel"
-                    :close-on-content-click="false"
-                    :nudge-right="40"
-                    transition="scale-transition"
-                    offset-y
-                    min-width="290px"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field 
-                        v-model="newUser.effectFrom" 
-                        :label="$t('message.effectFrom')" 
-                        prepend-icon="event" 
-                        readonly 
-                        v-bind="attrs" 
-                        v-on="on"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      v-model="newUser.effectFrom"
-                      @input="isShowEffectFromPanel=false"
-                    ></v-date-picker>
-                  </v-menu>
-                </v-col>
-                <v-col cols="6">
-                  <v-menu ref="effectFromMenu"
-                    v-model="isShowEffectFromMinutePanel"
-                    :close-on-content-click="false"
-                    :nudge-right="40"
-                    :return-value.sync="effectFromStringMinute"
-                    transition="scale-transition"
-                    offset-y
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                        v-model="effectFromStringMinute"
-                        label="Time"
-                        prepend-icon="access_time"
-                        readonly
-                        v-bind="attrs"
-                        v-on="on"
-                      >
-                      </v-text-field>
-                    </template>
-                    <v-time-picker
-                      v-if="isShowEffectFromMinutePanel"
-                      v-model="effectFromStringMinute"
-                      full-width
-                      @click:minute="$refs.effectFromMenu.save(effectFromStringMinute)"
-                    ></v-time-picker>
-                  </v-menu>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="6">
-                  <v-menu
-                    v-model="isShowExpiredAtPanel"
-                    :close-on-content-click="false"
-                    :nudge-right="40"
-                    transition="scale-transition"
-                    offset-y
-                    min-width="290px"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                        v-model="newUser.expiredAt"
-                        :label="$t('message.expiredAt')"
-                        prepend-icon="event"
-                        readonly
-                        v-bind="attrs"
-                        v-on="on"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      v-model="newUser.expiredAt"
-                      @input="isShowExpiredAtPanel=false"
-                    ></v-date-picker>
-                  </v-menu>
-                </v-col>
-                <v-col cols="6">
-                  <v-menu ref="expiredAtMenu"
-                    v-model="isShowExpiredAtMinutePanel"
-                    :close-on-content-click="false"
-                    :nudge-right="40"
-                    :return-value.sync="expiredAtStringMinute"
-                    transition="scale-transition"
-                    offset-y
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                        v-model="expiredAtStringMinute"
-                        label="Time"
-                        prepend-icon="access_time"
-                        readonly
-                        v-bind="attrs"
-                        v-on="on"
-                      >
-                      </v-text-field>
-                    </template>
-                    <v-time-picker
-                      v-if="isShowExpiredAtMinutePanel"
-                      v-model="expiredAtStringMinute"
-                      full-width
-                      @click:minute="$refs.expiredAtMenu.save(expiredAtStringMinute)"
-                    ></v-time-picker>
-                  </v-menu>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-row>
+                        <v-col cols="12" align="center">
+                          <v-img :src="srcFacePhoto" width="100" height="150"></v-img>
+                        </v-col>
+                        <v-col cols="12">
+                          <v-file-input 
+                            :label="$t('message.facePhoto')"
+                            :rules="uploadRules"
+                            filled
+                            v-model="facePhoto"
+                            prepend-icon="mdi-camera"
+                            @change="uploadFile()"
+                          ></v-file-input>
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                  </v-row>
                 </v-col>
               </v-row>
             </v-form>
@@ -272,6 +352,7 @@
 					<v-spacer></v-spacer>
 					<v-btn class="px-4" color="success" v-on:click="addNewUser">{{$t('message.add')}}</v-btn>
 					<v-btn class="px-4" color="error" @click.native="showNewUserDialog = false">{{$t('message.close')}}</v-btn>
+          <v-spacer></v-spacer>
 				</v-card-actions>
 			</v-card>
     </v-dialog>
@@ -319,7 +400,8 @@ export default {
       newUser: {
         devices: [],
         confidenceLevel: 80,
-        userType: 0
+        userType: 0,
+        allowPeriods: []
       },
       isShowEffectFromPanel: false,
       isShowEffectFromMinutePanel: false,
@@ -327,6 +409,12 @@ export default {
       isShowExpiredAtMinutePanel: false,
       effectFromStringMinute: "",
       expiredAtStringMinute: "",
+
+      isShowEndTime: false,
+      isShowStartTime: false,
+      endTime: "",
+      startTime: "",
+
       facePhoto: {},
       srcFacePhoto: "",
       uploadRules: [
@@ -334,6 +422,9 @@ export default {
       ],
       isNewUserValid: true,
       newUserRules: {
+        devices: [
+          devices => !!devices.length || 'Devices should not empty',
+        ],
         name: [ 
           name => !!name || 'Name is required',
           name => (name && name.length <= 10) || 'Name must be less than 10 characters',
@@ -402,12 +493,16 @@ export default {
         userId: "",
         expiredAt: "",
         effectFrom: "",
-        facePhoto: ""
+        facePhoto: "",
+        allowPeriods: []
       }
+      this.effectFromStringMinute = ""
+      this.expiredAtStringMinute = ""
       this.srcFacePhoto = ""
       this.facePhoto = {}
     },
-    async addNewUser() {
+    async addNewUser() {      
+      console.log(5555555, this.newUser)
       if(!this.$refs.newUser.validate()) return
       this.newUser = {
         ...this.newUser,
@@ -474,6 +569,22 @@ export default {
             this.newUser.devices = this.devices.slice()
           }
         })
+    },
+    showNewUserDialogMethod() {
+      this.showNewUserDialog = true
+      if (this.$refs.newUser) {
+        // When init ref this.$refs.newUser is undefined
+        this.$refs.newUser.resetValidation()
+      }
+    },
+    editUser(user) {
+      console.log(887, user);
+    },
+    addPeriod() {
+      this.newUser.allowPeriods = [...this.newUser.allowPeriods, { startTime: this.startTime, endTime: this.endTime }]
+      // this.newUser.allowPeriods.push({ startTime: this.startTime, endTime: this.endTime })
+      this.startTime = ""
+      this.endTime = ""
     }
   }
 };

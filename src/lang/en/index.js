@@ -595,5 +595,6 @@ export default {
   confidenceLevel: "Confidence Level",
   ic: "IC Card",
   device: "Device",
-  facePhoto: "Face Photo"
+  facePhoto: "Face Photo",
+  allowPeriods: "Allow Periods"
 }
