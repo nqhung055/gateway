@@ -257,7 +257,7 @@
                       </v-menu>
                     </v-col>
                     <v-col cols="1">
-                      <v-btn color="success" @click="addPeriod()"><v-icon>ti-plus</v-icon></v-btn>
+                      <v-icon size="25" style="color: green; cursor: pointer;" @click="addPeriod()">ti-plus</v-icon>
                     </v-col>
                   </v-row>
                 </v-col>
@@ -391,12 +391,14 @@ export default {
 <style>
 .v-text-field {
   margin-top: 0 !important;
-  padding-top: 8px !important;
+}
+.v-text-field input {
+  padding: 2px 0 2px;
 }
 .container {
   max-width: 100%;
 }
 .col {
-  padding: 8px 12px !important;
+  padding: 2px 10px !important;
 }
 </style>
