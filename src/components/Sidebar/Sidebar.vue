@@ -5,7 +5,7 @@
         <div class="transparent navigation">
           <v-list>
 				<app-logo></app-logo>
-            <user-block></user-block>
+            
 				<template v-for="(category, key) in menus">
 					<div :key="key">
 						<div class="sidebar-title px-4">
@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import UserBlock from "./UserBlock";
+// import UserBlock from "./UserBlock";
 import { textTruncate, getCurrentAppLayout } from "Helpers/helpers";
 import { mapGetters } from "vuex";
 import AppLogo from "Components/AppLogo/AppLogo";
@@ -101,7 +101,7 @@ export default {
     };
   },
   components: {
-    UserBlock,
+    // UserBlock,
     AppLogo
   },
   computed: {

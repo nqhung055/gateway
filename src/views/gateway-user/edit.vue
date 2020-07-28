@@ -389,5 +389,14 @@ export default {
 </script>
 
 <style>
-
+.v-text-field {
+  margin-top: 0 !important;
+  padding-top: 8px !important;
+}
+.container {
+  max-width: 100%;
+}
+.col {
+  padding: 8px 12px !important;
+}
 </style>
