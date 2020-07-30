@@ -77,6 +77,23 @@
               <v-row>                
                 <v-col cols="12">
                   <v-row>
+                    <v-col cols="6" class="container-user-photo" order-md="last">
+                      <v-row>
+                        <v-col cols="12" align="center">
+                          <v-img :src="srcFacePhoto" width="100" height="96"></v-img>
+                        </v-col>
+                        <v-col cols="12">
+                          <v-file-input 
+                            :label="$t('message.facePhoto')"
+                            :rules="uploadRules"
+                            filled
+                            v-model="facePhoto"
+                            prepend-icon="mdi-camera"
+                            @change="uploadFile()"
+                          ></v-file-input>
+                        </v-col>
+                      </v-row>
+                    </v-col>
                     <v-col cols="6" class="container-user-info">
                       <v-row>
                         <v-col cols="12" class="user-devices">
@@ -104,23 +121,6 @@
                           <div>
                             <v-text-field :label="$t('message.name')" v-model="newUser.name" :rules="newUserRules.name" required></v-text-field>
                           </div>
-                        </v-col>
-                      </v-row>
-                    </v-col>
-                    <v-col cols="6" class="container-user-photo" order-sm="first" order-xs="first" order-md="last">
-                      <v-row>
-                        <v-col cols="12" align="center">
-                          <v-img :src="srcFacePhoto" width="100" height="96"></v-img>
-                        </v-col>
-                        <v-col cols="12">
-                          <v-file-input 
-                            :label="$t('message.facePhoto')"
-                            :rules="uploadRules"
-                            filled
-                            v-model="facePhoto"
-                            prepend-icon="mdi-camera"
-                            @change="uploadFile()"
-                          ></v-file-input>
                         </v-col>
                       </v-row>
                     </v-col>
