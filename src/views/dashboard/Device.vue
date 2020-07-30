@@ -107,7 +107,7 @@
                         </v-col>
                       </v-row>
                     </v-col>
-                    <v-col cols="6" class="container-user-photo">
+                    <v-col cols="6" class="container-user-photo" order-sm="first" order-xs="first" order-md="last">
                       <v-row>
                         <v-col cols="12" align="center">
                           <v-img :src="srcFacePhoto" width="100" height="96"></v-img>
@@ -656,7 +656,9 @@ export default {
 
 @media only screen and (max-width: 720px) {
   .continer-user-left,
-  .continer-user-right {
+  .continer-user-right,
+  .container-user-info,
+  .container-user-photo {
     flex: 0 0 100%;
     max-width: 100%;
   }
